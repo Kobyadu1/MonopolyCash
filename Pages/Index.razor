@@ -1,0 +1,69 @@
+﻿@page "/"
+@inject NavigationManager NavManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+@using MonopolyCash.Data
+@using Microsoft.AspNetCore.SignalR.Client
+
+
+
+<style>
+.container {
+  height: 500px;
+  position: relative;
+  border: 3px solid green;
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+</style>
+
+<div class="container" style="background-color:powderblue;">
+    <div class="center">
+        <h1>Welcome to Monopoly Cash Online</h1>
+        <p>Enter your name: <input @bind-value="name" @bind-value:event="oninput"/></p>
+        <button class="btn btn-primary" @onclick="create">Start New Game</button>
+        <p>Enter the game code: <input @bind-value="code" @bind-value:event="oninput"/></p>
+        <button class="btn btn-primary" @onclick="join">Join a Game</button>
+    </div>
+</div>
+
+@code {
+    private string name { get; set; } = "";
+    private string code { get; set; } = "";
+    HubConnection connection;
+
+    protected async override Task OnInitializedAsync()
+    {
+        //Initialize SignalR
+        connection = new HubConnectionBuilder()
+        .WithUrl("https://monopolycash20210106194636.azurewebsites.net/gamehub")
+        .Build();
+        await connection.StartAsync();
+    }
+
+    private async void create()
+    {
+        String key = new Helper().generateKey();
+        await connection.InvokeAsync("createRoom",key,name,1500);
+        await localStorage.SetItemAsync("playerID", (name+key).GetHashCode());
+
+        NavManager.NavigateTo("/lobby");
+    }
+    private async void join()
+    {
+        String key = code;
+        await connection.InvokeAsync("joinRoom",key,name,1500);
+        await localStorage.SetItemAsync("playerID", (name+key).GetHashCode());
+
+        NavManager.NavigateTo("/lobby");
+    }
+
+}

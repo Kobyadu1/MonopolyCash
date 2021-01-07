@@ -1,0 +1,48 @@
+﻿@page "/game"
+@inject NavigationManager NavManager
+@inject IToastService toastService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<style>
+.container {
+  height: 500px;
+  position: relative;
+  border: 3px solid green;
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+</style>
+
+<div class="container" style="background-color:powderblue;">
+    <div class="center">
+
+    </div>
+</div>
+
+@code {
+    HubConnection connection;
+    string gameKey;
+    int playerID;
+    String balance;
+    Object[] data;
+    protected override async Task OnInitializedAsync()
+    {
+        connection = new HubConnectionBuilder()
+        .WithUrl("https://monopolycash20210106194636.azurewebsites.net/gamehub")
+        .Build();
+        await connection.StartAsync();
+        //connection.On<String[]>("joinedRoom", NotifyUserJoin);
+
+        playerID = await localStorage.GetItemAsync<int>("playerID");
+        data = await connection.InvokeAsync<Object[]>("getPlayerData",playerID);
+        gameKey = data[4].ToString();
+        balance = data[2].ToString();
+    }
+}

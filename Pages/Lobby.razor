@@ -1,0 +1,114 @@
+﻿@page "/lobby"
+@inject NavigationManager NavManager
+@inject IToastService toastService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@using Microsoft.AspNetCore.SignalR.Client
+
+<style>
+.container {
+  height: 500px;
+  position: relative;
+  border: 3px solid green;
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+</style>
+
+<div class="container" style="background-color:powderblue;">
+    <div class="center">
+        @if (playerData == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else 
+        {
+        <p>Lobby Key: @gameKey</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (KeyValuePair<string,string> player in playerData)
+                {
+                    <tr>
+                        <td>@player.Key</td>
+                        <td>@player.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button class="btn btn-primary" @onclick="update">Ready?</button>
+        } 
+    </div>
+</div>
+}
+
+@code {
+    Dictionary<String,String> playerData;
+    HubConnection connection;
+    string gameKey;
+    int playerID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        connection = new HubConnectionBuilder()
+        .WithUrl("https://monopolycash20210106194636.azurewebsites.net/gamehub")
+        .Build();
+        await connection.StartAsync();
+        connection.On<String[]>("joinedRoom", NotifyUserJoin);
+        connection.On<String>("ready", NotifyUserReady);
+
+        playerID = await localStorage.GetItemAsync<int>("playerID");
+        playerData = await connection.InvokeAsync<Dictionary<String, String>>("readStatus",playerID);
+        Object[] data = await connection.InvokeAsync<Object[]>("getPlayerData",playerID);
+        gameKey = data[4].ToString();
+    }
+    async Task NotifyUserJoin(String[]data) 
+    {
+        if(data[1].Equals(gameKey))
+        {
+            toastService.ShowInfo(data[0] + " has joined the lobby.");
+            playerData = await connection.InvokeAsync<Dictionary<String, String>>("readStatus",playerID);
+            StateHasChanged();
+            await Task.CompletedTask;
+        }
+        else 
+        {
+            await Task.CompletedTask;  
+        }
+    }
+    async Task NotifyUserReady(String gameKey) 
+    {
+        if(this.gameKey.Equals(gameKey))
+        {
+            playerData = await connection.InvokeAsync<Dictionary<String, String>>("readStatus",playerID);
+            StateHasChanged();
+            await Task.CompletedTask;
+        }
+        else 
+        {
+            await Task.CompletedTask;  
+        }
+    }
+
+    private async void update()
+    {
+        await connection.InvokeAsync("updateStatus",playerID);
+        playerData = await connection.InvokeAsync<Dictionary<String, String>>("readStatus",playerID);
+        StateHasChanged();
+    }
+
+
+}
+

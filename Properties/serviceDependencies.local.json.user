@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "signalr1": {
+      "restored": true,
+      "restoreTime": "2020-12-27T03:13:27.1728315Z"
+    },
+    "secrets1": {
+      "restored": true,
+      "restoreTime": "2020-12-27T03:13:13.4986575Z"
+    }
+  },
+  "parameters": {
+    "signalr1.resourceGroupName": {
+      "Name": "signalr1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "monopoly"
+    },
+    "signalr1.subscriptionId": {
+      "Name": "signalr1.subscriptionId",
+      "Type": "subscription",
+      "Value": "5874b983-afe3-49e1-9938-d9698908b78b"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "signalr1": {
+      "restored": true,
+      "restoreTime": "2021-01-07T01:50:53.7319325Z"
+    },
+    "secrets1": {
+      "restored": true,
+      "restoreTime": "2021-01-07T01:54:27.3892474Z"
+    }
+  },
+  "parameters": {
+    "signalr1.resourceGroupName": {
+      "Name": "signalr1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "monopoly"
+    },
+    "secrets1.resourceGroupName": {
+      "Name": "secrets1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "monopoly"
+    },
+    "signalr1.subscriptionId": {
+      "Name": "signalr1.subscriptionId",
+      "Type": "subscription",
+      "Value": "5874b983-afe3-49e1-9938-d9698908b78b"
+    },
+    "secrets1.subscriptionId": {
+      "Name": "secrets1.subscriptionId",
+      "Type": "subscription",
+      "Value": "5874b983-afe3-49e1-9938-d9698908b78b"
+    }
+  }
+}
